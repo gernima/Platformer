@@ -71,7 +71,7 @@ public class Hero : MonoBehaviour
     }
     float CalculateJumpVelocity(float yVelocity)
     {
-        var isFalling = _rigidbody.velocity.y <= 0;
+        var isFalling = _rigidbody.velocity.y <= 0.001f;
         if (!isFalling) return yVelocity;
 
         if (_isGrounded)
