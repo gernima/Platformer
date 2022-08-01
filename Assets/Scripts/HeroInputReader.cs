@@ -10,6 +10,7 @@ public class HeroInputReader : MonoBehaviour
         _inputActions = new HeroInputAction();  
         _inputActions.Hero.Movement.performed += OnMovement;
         _inputActions.Hero.Movement.canceled += OnMovement;
+        _inputActions.Hero.Hit.performed += Hit;
     }
     private void OnEnable()
     {
@@ -19,5 +20,9 @@ public class HeroInputReader : MonoBehaviour
     {
         var direction = context.ReadValue<Vector2>();
         _hero.SetDirection(direction);
+    }
+    private void Hit(InputAction.CallbackContext context)
+    {
+        Debug.Log("hit");
     }
 }
