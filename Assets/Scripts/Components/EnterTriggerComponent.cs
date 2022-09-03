@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,7 +7,7 @@ using UnityEngine.Events;
 public class EnterTriggerComponent : MonoBehaviour
 {
     [SerializeField] private string _tag;
-    public UnityEvent _action;
+    [SerializeField] private EnterEvent _action;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -14,8 +15,13 @@ public class EnterTriggerComponent : MonoBehaviour
         {
             if (_action != null)
             {
-                _action.Invoke();
+                _action.Invoke(collision.gameObject);
             }
         }
+    }
+    [Serializable]
+    public class EnterEvent : UnityEvent<GameObject>
+    {
+
     }
 }

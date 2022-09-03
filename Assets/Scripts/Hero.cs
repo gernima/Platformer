@@ -11,6 +11,16 @@ public class Hero : MonoBehaviour
 {
     [SerializeField] private float _speed;
     [SerializeField] private float _jumpSpeed;
+    [SerializeField] private float _damageJumpSpeed;
+    [SerializeField] private float _interactionRadius;
+    [SerializeField] private int _coins;
+
+    [SerializeField] private LayerMask _interactionLayer;
+
+    [SerializeField] private SpawnComponent _footStepParticles;
+    [SerializeField] private ParticleSystem _hitParticles;
+
+    private Collider2D[] _interactionResult = new Collider2D[1];
     public LayerCheck _groundCheck;
     private Vector2 _direction;
 
@@ -24,6 +34,7 @@ public class Hero : MonoBehaviour
     private static readonly int isGroundKey = Animator.StringToHash("isGround");
     private static readonly int verticalVelocityKey = Animator.StringToHash("verticalVelocity");
     private static readonly int isRunningKey = Animator.StringToHash("isRunning");
+    private static readonly int hit = Animator.StringToHash("hit");
 
     private void Awake()
     {
@@ -88,14 +99,52 @@ public class Hero : MonoBehaviour
     void UpdateSpriteDirection()
     {
         if (_direction.x > 0) {
+            transform.localScale = Vector3.one;
             _spriteRenderer.flipX = false;
         } else if (_direction.x < 0)
         {
-            _spriteRenderer.flipX = true;
+            transform.localScale = new Vector3(-1, 1, 1);
         } 
     }
     bool IsGrounded(){
         return _groundCheck.isTouchingLayer;
     }
-     
+    public void TakeDamage()
+    {
+        _animator.SetTrigger(hit);
+        _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, _damageJumpSpeed);
+
+        SpawnCoins();
+    }
+
+    public void AddCoins(int count)
+    {
+        _coins += count;
+        Debug.Log(_coins);
+    }
+
+    private void SpawnCoins()
+    {
+        var numCoinsToDispose = Mathf.Min(_coins, 5);
+        _coins -= numCoinsToDispose;
+
+        var burst = _hitParticles.emission.GetBurst(0);
+        burst.count = numCoinsToDispose;
+        _hitParticles.emission.SetBurst(0, burst);
+
+        _hitParticles.gameObject.SetActive(true);
+        _hitParticles.Play();
+    }
+    public void Interact()
+    {
+        var size = Physics2D.OverlapCircleNonAlloc(transform.position, _interactionRadius, _interactionResult, _interactionLayer);
+        for (int i=0; i<size; i++)
+        {
+            _interactionResult[i].GetComponent<InteractableComponent>()?.Interact();
+        }
+    }
+    public void SpawnFootDust()
+    {
+        _footStepParticles.Spawn();
+    }
 }

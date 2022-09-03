@@ -8,21 +8,32 @@ public class HeroInputReader : MonoBehaviour
     private void Awake()
     {
         _inputActions = new HeroInputAction();  
+        /*
         _inputActions.Hero.Movement.performed += OnMovement;
         _inputActions.Hero.Movement.canceled += OnMovement;
         _inputActions.Hero.Hit.performed += Hit;
+        _inputActions.Hero.Interact.performed += OnInteract;
+        */
     }
     private void OnEnable()
     {
         _inputActions.Enable();
     }
-    private void OnMovement(InputAction.CallbackContext context)
+    public void OnMovement(InputAction.CallbackContext context)
     {
         var direction = context.ReadValue<Vector2>();
         _hero.SetDirection(direction);
     }
-    private void Hit(InputAction.CallbackContext context)
+    public void Hit(InputAction.CallbackContext context)
     {
         Debug.Log("hit");
+    }
+    public void OnInteract(InputAction.CallbackContext context)
+    {
+        if (context.canceled)
+        {
+            Debug.Log("Interact");
+            _hero.Interact();
+        }
     }
 }
